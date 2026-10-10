@@ -26,7 +26,7 @@ class Shipink extends Module
 
         $this->name = 'shipink';
         $this->tab = 'shipping_logistics';
-        $this->version = '1.0.3';
+        $this->version = '1.0.4';
         $this->author = 'Shipink';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = [
@@ -97,6 +97,13 @@ class Shipink extends Module
                 ]);
             }
         }
+
+        // Credit slips are read-only: Shipink reads refunds, it never creates them.
+        Db::getInstance()->insert('webservice_permission', [
+            'id_webservice_account' => (int) $key->id,
+            'resource' => 'order_slip',
+            'method' => 'GET',
+        ]);
 
         Configuration::updateValue('SHIPINK_WEBSERVICE_KEY_ID', (int) $key->id);
 

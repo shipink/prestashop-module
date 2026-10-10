@@ -148,7 +148,7 @@ class WebserviceSpecificManagementOrdersExtended implements WebserviceSpecificMa
                             $currency = new Currency((int) $orderData['id_currency']);
 
                             $productsQuery = new DbQuery();
-                            $productsQuery->select('product_id, product_name, product_quantity, product_price, total_price_tax_incl, total_price_tax_excl');
+                            $productsQuery->select('id_order_detail, product_id, product_attribute_id, product_reference, product_name, product_quantity, product_price, total_price_tax_incl, total_price_tax_excl');
                             $productsQuery->from('order_detail');
                             $productsQuery->where('id_order = ' . (int) $orderData['id_order']);
                             $productDetails = Db::getInstance()->executeS($productsQuery);
@@ -200,6 +200,9 @@ class WebserviceSpecificManagementOrdersExtended implements WebserviceSpecificMa
                                     'total_price_tax_incl' => (float) $product['total_price_tax_incl'],
                                     'total_price_tax_excl' => (float) $product['total_price_tax_excl'],
                                     'image' => $imageUrl,
+                                    'id_order_detail' => (int) $product['id_order_detail'],
+                                    'product_attribute_id' => (int) $product['product_attribute_id'],
+                                    'product_reference' => $product['product_reference'],
                                 ];
                             }
 
@@ -215,7 +218,6 @@ class WebserviceSpecificManagementOrdersExtended implements WebserviceSpecificMa
                                 'current_state_id' => $state->id,
                                 'date_add' => $orderData['date_add'],
                                 'date_upd' => $orderData['date_upd'],
-                                'note' => $orderData['note'],
                                 'customer' => [
                                     'id' => $customer->id,
                                     'firstname' => $customer->firstname,
