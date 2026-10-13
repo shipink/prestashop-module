@@ -1,14 +1,16 @@
-# Attaches shipink.zip (top-level shipink/ folder, as PrestaShop requires) to
-# every published release. app-ui links releases/latest/download/shipink.zip.
+# Pushing a tag publishes a release for it with shipink.zip (top-level shipink/
+# folder, as PrestaShop requires) attached. app-ui links
+# releases/latest/download/shipink.zip.
 name: Release zip
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "*"
   workflow_dispatch:
     inputs:
       tag:
-        description: Existing release tag
+        description: Existing tag
         required: true
 
 permissions:
@@ -18,11 +20,16 @@ jobs:
   zip:
     runs-on: ubuntu-latest
     env:
-      TAG: ${{ github.event.release.tag_name || inputs.tag }}
+      TAG: ${{ inputs.tag || github.ref_name }}
       GH_TOKEN: ${{ github.token }}
     steps:
       - uses: actions/checkout@v4
         with:
           ref: ${{ env.TAG }}
       - run: git archive --prefix=shipink/ -o shipink.zip HEAD -- . ':!.github'
-      - run: gh release upload "$TAG" shipink.zip --clobber
+      - run: |
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" shipink.zip --clobber
+          else
+            gh release create "$TAG" shipink.zip --title "$TAG" --generate-notes
+          fi
