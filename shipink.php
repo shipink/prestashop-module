@@ -26,7 +26,7 @@ class Shipink extends Module
 
         $this->name = 'shipink';
         $this->tab = 'shipping_logistics';
-        $this->version = '1.0.4';
+        $this->version = '1.0.5';
         $this->author = 'Shipink';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = [
@@ -48,6 +48,8 @@ class Shipink extends Module
 
         return parent::install()
             && $this->registerHook('addWebserviceResources')
+            && $this->registerHook('actionGetAdminOrderButtons')
+            && $this->registerHook('displayAdminOrder')
             && $this->createWebserviceKey();
     }
 
@@ -68,6 +70,46 @@ class Shipink extends Module
                 'forbidden_method' => ['PUT', 'POST', 'DELETE'],
             ],
         ];
+    }
+
+    /**
+     * "Open in Shipink" in the order page's top action bar (PrestaShop 1.7.7+).
+     */
+    public function hookActionGetAdminOrderButtons(array $params)
+    {
+        $params['actions_bar_buttons_collection']->add(
+            new \PrestaShopBundle\Controller\Admin\Sell\Order\ActionsBarButton(
+                'btn-secondary',
+                ['href' => $this->getShipinkOrderUrl((int) $params['id_order']), 'target' => '_blank', 'rel' => 'noopener noreferrer'],
+                $this->l('Open in Shipink')
+            )
+        );
+    }
+
+    /**
+     * Same button for order pages older than 1.7.7, which have no action bar hook.
+     */
+    public function hookDisplayAdminOrder(array $params)
+    {
+        if (version_compare(_PS_VERSION_, '1.7.7.0', '>=')) {
+            return '';
+        }
+
+        return '<a class="btn btn-default" href="' . htmlspecialchars($this->getShipinkOrderUrl((int) $params['id_order'])) . '" target="_blank" rel="noopener noreferrer">'
+            . htmlspecialchars($this->l('Open in Shipink')) . '</a>';
+    }
+
+    /**
+     * Shipink stores the PrestaShop order id as the channel order id; with
+     * action=open its orders page opens the single matching order.
+     */
+    private function getShipinkOrderUrl($idOrder)
+    {
+        return 'https://app.shipink.io/orders?' . http_build_query([
+            'sales_channel_id' => 'prestashop',
+            'sales_channel_order_id' => $idOrder,
+            'action' => 'open',
+        ], '', '&', PHP_QUERY_RFC3986);
     }
 
     private function createWebserviceKey()

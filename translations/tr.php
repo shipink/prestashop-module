@@ -25,5 +25,6 @@ $_MODULE['<{shipink}prestashop>shipink_c2a6ce90e0402b4ce929b9ffbecff4a6'] = 'Shi
 $_MODULE['<{shipink}prestashop>shipink_8bb993d4703db12ecdd6f9ec30a66e49'] = 'Detaylı bilgi içeren genişletilmiş sipariş verileri';
 $_MODULE['<{shipink}prestashop>shipink_6e8a999d2703f06f25340b75fd3487c2'] = 'Shipink Entegrasyonu';
 $_MODULE['<{shipink}prestashop>shipink_03dc51b7f7ac5b25444532911ab6699f'] = 'Web servis anahtarı oluşturulamadı.';
+$_MODULE['<{shipink}prestashop>shipink_3cbf170c9d6d3d02b02ed3a3492db38a'] = 'Shipink\'te aç';
 
 return $_MODULE;
