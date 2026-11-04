@@ -26,7 +26,7 @@ class Shipink extends Module
 
         $this->name = 'shipink';
         $this->tab = 'shipping_logistics';
-        $this->version = '1.0.5';
+        $this->version = '1.0.6';
         $this->author = 'Shipink';
         $this->need_instance = 0;
         $this->ps_versions_compliancy = [
@@ -77,8 +77,14 @@ class Shipink extends Module
      */
     public function hookActionGetAdminOrderButtons(array $params)
     {
+        // The Bundle class was deprecated in 8.0 and removed in 9.0; the Core
+        // one exists since 8.0. 1.7.7-1.7.8 only have the Bundle class.
+        $buttonClass = class_exists('\PrestaShop\PrestaShop\Core\Action\ActionsBarButton')
+            ? '\PrestaShop\PrestaShop\Core\Action\ActionsBarButton'
+            : '\PrestaShopBundle\Controller\Admin\Sell\Order\ActionsBarButton';
+
         $params['actions_bar_buttons_collection']->add(
-            new \PrestaShopBundle\Controller\Admin\Sell\Order\ActionsBarButton(
+            new $buttonClass(
                 'btn-secondary',
                 ['href' => $this->getShipinkOrderUrl((int) $params['id_order']), 'target' => '_blank', 'rel' => 'noopener noreferrer'],
                 $this->l('Open in Shipink')
